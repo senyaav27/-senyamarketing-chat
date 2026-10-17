@@ -1,4 +1,12 @@
+import { webhookSecrets } from "./secrets.js";
 export function config(env = process.env) {
+  const secrets = webhookSecrets(env);
+  env = {
+    ...env,
+    PUBLIC_URL: env.PUBLIC_URL || env.RENDER_EXTERNAL_URL,
+    TELEGRAM_WEBHOOK_SECRET: secrets.webhookSecret,
+    TILDA_WEBHOOK_SECRET: secrets.tildaSecret,
+  };
   const required = [
     "DATABASE_URL",
     "TELEGRAM_BOT_TOKEN",
@@ -24,6 +32,19 @@ export function config(env = process.env) {
   const origins = env.ALLOWED_ORIGINS.split(",").map(
     (x) => new URL(x.trim()).origin,
   );
+  if (
+    env.RENDER_EXTERNAL_URL &&
+    new URL(env.RENDER_EXTERNAL_URL).origin === publicUrl &&
+    !origins.includes(publicUrl)
+  )
+    origins.push(publicUrl);
+  const workerIdleMs = Number(env.WORKER_IDLE_MS || 1500);
+  if (
+    !Number.isInteger(workerIdleMs) ||
+    workerIdleMs < 1000 ||
+    workerIdleMs > 3600000
+  )
+    throw new Error("Invalid WORKER_IDLE_MS");
   const retention = Number(env.RETENTION_DAYS || 90);
   if (!Number.isInteger(retention) || retention < 1 || retention > 3650)
     throw new Error("Invalid RETENTION_DAYS");
@@ -32,6 +53,7 @@ export function config(env = process.env) {
     throw new Error("Invalid privacy URL");
   return {
     publicUrl,
+    workerIdleMs,
     origins,
     retention,
     privacyUrl,

@@ -7,8 +7,10 @@ async function main() {
   const cfg = config(),
     db = database(process.env.DATABASE_URL);
   await migrate(db);
-  const stopWorker = startWorker(db, telegram(cfg.token), cfg.retention);
-  const server = createApp(db, cfg).listen(
+  const stopWorker = startWorker(db, telegram(cfg.token), cfg.retention, {
+    idleMs: cfg.workerIdleMs,
+  });
+  const server = createApp(db, cfg, { onQueued: stopWorker.wake }).listen(
     Number(process.env.PORT || 3000),
     "0.0.0.0",
     () => console.log("chat_server_started"),

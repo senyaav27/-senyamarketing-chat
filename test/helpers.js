@@ -32,12 +32,12 @@ export async function createDB(directory) {
     close: () => raw.close(),
   };
 }
-export async function fixture({ persist = false } = {}) {
+export async function fixture({ persist = false, onQueued } = {}) {
   const directory = persist
     ? await mkdtemp(path.join(tmpdir(), "senya-pg-"))
     : undefined;
   const db = await createDB(directory);
-  const server = createApp(db, cfg).listen(0, "127.0.0.1");
+  const server = createApp(db, cfg, { onQueued }).listen(0, "127.0.0.1");
   await new Promise((r) => server.once("listening", r));
   const url = "http://127.0.0.1:" + server.address().port;
   async function request(route, { token, body, headers = {}, method } = {}) {

@@ -2,6 +2,10 @@
 
 Живой чат для senyamarketing.ru и @SenyaaMarketing_chat_bot. Node.js 24, Express 5, PostgreSQL. Без ИИ. Исходники сервера в src/, изолированный Shadow DOM виджет в public/widget.js. Демо: `/`. Клиент опрашивает сервер каждые 4 секунды, пока вкладка видима, в том числе при свёрнутом чате. Посетителю Telegram не нужен.
 
+## Бесплатная альтернатива Railway
+
+Подготовлено размещение на **Render Free + Neon Free**: [конфигурация и ограничения](docs/FREE-HOSTING.md), Blueprint `render.yaml`. Отдельный проект Neon уже создан: `senyamarketing-chat`, PostgreSQL 18, тариф Free. Подключение Render ещё ожидается. Публичного сервера пока нет. После простоя у бесплатного Render возможна задержка пробуждения около минуты; эта схема не обещает мгновенный ответ круглосуточно.
+
 ## Текущее размещение
 
 Код загружен в [senyaav27/-senyamarketing-chat](https://github.com/senyaav27/-senyamarketing-chat). [GitHub Actions](https://github.com/senyaav27/-senyamarketing-chat/actions/runs/39031272537) успешно проверил PostgreSQL 18, миграцию, Docker и полный браузерный сценарий. Telegram в тестах подменён.

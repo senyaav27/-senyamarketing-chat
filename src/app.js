@@ -60,9 +60,15 @@ async function queue(tx, cfg, text, { messageId = null, formId = null } = {}) {
     ],
   );
 }
-export function createApp(db, cfg) {
+export function createApp(db, cfg, { onQueued = () => {} } = {}) {
   const app = express();
   app.disable("x-powered-by");
+  async function commitAndWake(fn) {
+    const result = await db.transaction(fn);
+    // Wake only after commit, independently of whether the browser stays connected.
+    onQueued();
+    return result;
+  }
   app.set("trust proxy", cfg.trustProxy);
   app.use((req, res, next) => {
     res.set({
@@ -173,7 +179,7 @@ export function createApp(db, cfg) {
       key = str(req.body.clientId, 80);
     if (!/^[a-zA-Z0-9_-]{16,80}$/.test(key))
       throw fail(400, "Некорректный ключ сообщения");
-    const result = await db.transaction(async (tx) => {
+    const result = await commitAndWake(async (tx) => {
       const {
         rows: [m],
       } = await tx.query(
@@ -217,7 +223,7 @@ export function createApp(db, cfg) {
     )
       throw fail(400, "Укажите телефон или @username в Telegram");
     const text = `Контакт: ${contact}${name ? "\nИмя: " + name : ""}`;
-    await db.transaction(async (tx) => {
+    await commitAndWake(async (tx) => {
       const {
         rows: [m],
       } = await tx.query(
@@ -260,7 +266,7 @@ export function createApp(db, cfg) {
       m.from?.is_bot
     )
       return res.json({ ok: true });
-    await db.transaction(async (tx) => {
+    await commitAndWake(async (tx) => {
       const { rows } = await tx.query(
         "INSERT INTO telegram_updates(id) VALUES ($1) ON CONFLICT DO NOTHING RETURNING id",
         [u.update_id],
@@ -313,7 +319,7 @@ export function createApp(db, cfg) {
     if (!Object.keys(fields).length) throw fail(400, "No configured fields");
     const name = String(cfg.formNames[formid] || formid).slice(0, 120);
     const payload = { name, formid, tranid, fields };
-    await db.transaction(async (tx) => {
+    await commitAndWake(async (tx) => {
       const {
         rows: [lead],
       } = await tx.query(

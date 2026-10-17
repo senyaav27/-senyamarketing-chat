@@ -60,12 +60,17 @@ export async function cleanup(db, days) {
     );
   });
 }
-export function startWorker(db, api, days) {
+export function startWorker(db, api, days, { idleMs = 1500 } = {}) {
   let stopping = false,
     timer,
     lastCleanup = 0,
-    active = Promise.resolve();
+    running = false,
+    wakeRequested = false;
+  let active = Promise.resolve();
   async function tick() {
+    running = true;
+    wakeRequested = false;
+    let wait = idleMs;
     try {
       for (let i = 0; i < 20 && !stopping; i++)
         if (!(await deliverOne(db, api))) break;
@@ -73,18 +78,45 @@ export function startWorker(db, api, days) {
         await cleanup(db, days);
         lastCleanup = Date.now();
       }
+      const {
+        rows: [pending],
+      } = await db.query(
+        "SELECT min(next_at) AS next_at FROM outbox WHERE sent_at IS NULL",
+      );
+      if (pending?.next_at)
+        wait = Math.max(
+          1000,
+          Math.min(idleMs, new Date(pending.next_at).getTime() - Date.now()),
+        );
     } catch {
       console.error("worker_error");
+      wait = 15000;
+    } finally {
+      running = false;
+      if (!stopping)
+        timer = setTimeout(
+          () => {
+            active = tick();
+          },
+          wakeRequested ? 0 : wait,
+        );
     }
-    if (!stopping)
-      timer = setTimeout(() => {
-        active = tick();
-      }, 1500);
+  }
+  function wake() {
+    if (stopping) return;
+    if (running) {
+      wakeRequested = true;
+      return;
+    }
+    clearTimeout(timer);
+    active = tick();
   }
   active = tick();
-  return async () => {
+  const stop = async () => {
     stopping = true;
     clearTimeout(timer);
     await active;
   };
+  stop.wake = wake;
+  return stop;
 }

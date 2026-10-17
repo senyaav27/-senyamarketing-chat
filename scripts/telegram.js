@@ -1,3 +1,4 @@
+import { webhookSecrets } from "../src/secrets.js";
 import { telegram } from "../src/telegram.js";
 const token = process.env.TELEGRAM_BOT_TOKEN;
 if (!token) throw new Error("Set TELEGRAM_BOT_TOKEN in server environment");
@@ -38,8 +39,8 @@ try {
         }),
       );
   } else if (command === "setup") {
-    const url = process.env.PUBLIC_URL,
-      secret = process.env.TELEGRAM_WEBHOOK_SECRET;
+    const url = process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL,
+      secret = webhookSecrets().webhookSecret;
     if (!url?.startsWith("https://") || !secret || secret.length < 32)
       throw new Error("Set HTTPS PUBLIC_URL and TELEGRAM_WEBHOOK_SECRET");
     await api("setWebhook", {

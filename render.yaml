@@ -1,0 +1,32 @@
+# Existing Node app. This blueprint creates only one FREE web service.
+# PostgreSQL is provisioned separately on Neon's Free plan, never Render's 30-day DB.
+services:
+  - type: web
+    name: senyamarketing-chat
+    runtime: docker
+    plan: free
+    region: frankfurt
+    repo: https://github.com/senyaav27/-senyamarketing-chat
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_OWNER_ID
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: CHAT_SECRET_SEED
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: https://senyamarketing.ru,https://www.senyamarketing.ru
+      - key: TRUST_PROXY
+        value: "1"
+      - key: RETENTION_DAYS
+        value: "90"
+      - key: WORKER_IDLE_MS
+        value: "900000"
