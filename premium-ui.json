@@ -1,0 +1,10 @@
+{
+  "profile": "product-admin",
+  "sourceRoots": ["public"],
+  "locale": "ru-RU",
+  "canonicalMap": "UX-CONTRACT.md",
+  "requiredCapabilities": ["Form", "Scrollbar", "Toast"],
+  "commands": { "unit": "npm test", "e2e": "npm run test:browser" },
+  "requiredCommands": ["unit", "e2e"],
+  "evidence": { "failurePaths": "test/flow.test.js" }
+}

@@ -1,0 +1,13 @@
+{
+  "findings": [],
+  "mode": "strict",
+  "projectRoot": "/Users/senyaav/Documents/Codex/2026-10-17/files-pasted-by-the-user-senyamarketing/outputs/senya-chat",
+  "schemaVersion": 1,
+  "summary": {
+    "errors": 0,
+    "total": 0,
+    "unresolved": 0,
+    "violations": 0,
+    "warnings": 0
+  }
+}

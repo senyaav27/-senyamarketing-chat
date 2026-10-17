@@ -1,0 +1,28 @@
+{
+  "name": "senya-tilda-chat",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "migrate": "node scripts/migrate.js",
+    "test": "node --test test/*.test.js",
+    "test:browser": "node test/browser.js",
+    "check": "node --check src/app.js && node --check src/worker.js && node --check public/widget.js",
+    "telegram:setup": "node scripts/telegram.js setup",
+    "telegram:status": "node scripts/telegram.js status",
+    "telegram:identify": "node scripts/telegram.js identify",
+    "demo": "node test/demo-server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.3.10",
+    "playwright": "^1.56.0"
+  }
+}
