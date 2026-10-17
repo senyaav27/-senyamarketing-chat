@@ -2,6 +2,12 @@
 
 Живой чат для senyamarketing.ru и @SenyaaMarketing_chat_bot. Node.js 24, Express 5, PostgreSQL. Без ИИ. Исходники сервера в src/, изолированный Shadow DOM виджет в public/widget.js. Демо: `/`. Клиент опрашивает сервер каждые 4 секунды, пока вкладка видима, в том числе при свёрнутом чате. Посетителю Telegram не нужен.
 
+## Текущее размещение
+
+Код загружен в [senyaav27/-senyamarketing-chat](https://github.com/senyaav27/-senyamarketing-chat). [GitHub Actions](https://github.com/senyaav27/-senyamarketing-chat/actions/runs/39031272537) успешно проверил PostgreSQL 18, миграцию, Docker и полный браузерный сценарий. Telegram в тестах подменён.
+
+Railway отказал в создании отдельного проекта сообщением `Free plan resource provision limit exceeded. Please upgrade to provision more resources!`. Поэтому PostgreSQL, приложение и публичный домен в Railway пока не созданы. Тариф не изменялся, платные дополнения не подключались. Tilda открывает страницу входа, доступной авторизованной сессии нет. Jivo не менялся. Токен бота и числовые IDs пока не настроены; секреты в GitHub не загружались.
+
 ## 1. Локальный запуск
 
 ```sh
@@ -31,7 +37,7 @@ npm run test:browser
 
 ## 2. Размещение на Railway
 
-Создайте НОВЫЙ приватный GitHub-репозиторий с содержимым этой папки. Если вы ещё не работали с GitHub: войдите на github.com, нажмите New repository, задайте имя (например senya-tilda-chat), выберите Private и создайте пустой репозиторий. На его странице выберите uploading an existing file, загрузите файлы проекта из распакованного архива и подтвердите Commit changes. Файлы package.json, Dockerfile и railway.json должны оказаться в корне, а не внутри дополнительной папки. Через Add file → Create new file создайте .env.example и .gitignore, если загрузчик вашей ОС скрывает файлы с точкой; секреты туда не вставляйте. При подключении GitHub к Railway разрешите доступ только к этому репозиторию. Не загружайте node_modules, .env и test-results. Существующие Railway-проекты не нужны.
+Используйте уже заполненный репозиторий https://github.com/senyaav27/-senyamarketing-chat. Файлы конфигурации размещены в корне. Не загружайте .env или серверные секреты. После снятия ограничения Railway продолжайте ниже.
 
 1. В Railway создайте отдельный проект и добавьте PostgreSQL штатным сервисом базы. Включите доступные вашему тарифу резервные копии, проверьте восстановление и ограничьте доступ к проекту.
 2. Добавьте сервис из созданного GitHub-репозитория. В корне уже лежат Dockerfile и railway.json. Docker собирает `npm ci --omit=dev`. Запуск: `node src/server.js`. Healthcheck: `/health`.
